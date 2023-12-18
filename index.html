@@ -12,53 +12,39 @@
 <body>
 
     <div class="container mt-5">
-        <form id="myForm">
-            <!-- První řádek formuláře -->
+        <form class="form-inline" id="myForm">
+            <!-- První řádek formuláře s obrázkem -->
             <div class="form-group">
-                <input type="text" class="form-control" name="item1" placeholder="Položka 1">
+                <div class="d-flex align-items-center">
+
+                    <input type="text" class="form-control" name="item1" placeholder="Položka 1">
+                    <button type="button" class="btn btn-primary" data-toggle="collapse"
+                        data-target="#menuObrazek">Nahrát obrázek</button>
+                    <div id="menuObrazek" class="collapse">
+                        
+                            <input type="file" class="mr-2" accept="image/*" name="imageFile">
+                            <!-- Input pro načítání souboru -->
+                            <p>NEBO</p>
+                            <input type="text" class="form-control mr-2" name="imageUrl"
+                                placeholder="URL obrázku"><!-- Input pro zadání URL -->
+                        
+                    </div>
+                </div>
             </div>
         </form>
         
-        <!-- Tlačítko pro přidání nového řádku -->
-        <button type="button" class="btn btn-primary" id="addRowBtn">Přidat další položku</button>
-    </div>
-    
+            <!-- Tlačítko pro přidání nového řádku -->
+            <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
+            <button type="button" class="btn btn-danger float-right" id="startComparing">Začít vytvářet</button>
+       
+            </div>
+
     <!-- Připojení Bootstrap JS a Popper.js (pro Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var form = document.getElementById("myForm");
-        var addRowBtn = document.getElementById("addRowBtn");
-    
-        function addNewRow() {
-            // Vytvořit nový řádek formuláře
-            var newItem = document.createElement("div");
-            newItem.className = "form-group";
-            newItem.innerHTML = '<input type="text" class="form-control" name="item' + (form.children.length + 1) + '" placeholder="Položka ' + (form.children.length + 1) + '">';
-    
-            // Přidat nový řádek do formuláře
-            form.appendChild(newItem);
-    
-            // Focus na nově přidaný vstup pro okamžité začátky psaní
-            var newInput = newItem.querySelector("input");
-            newInput.focus();
-        }
-    
-        // Přidat nový řádek po kliknutí na tlačítko
-        addRowBtn.addEventListener("click", addNewRow);
-    
-        // Přidat nový řádek po stisknutí klávesy Enter v posledním poli
-        form.addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Zabránit výchozímu chování klávesy Enter (odeslání formuláře)
-                addNewRow();
-            }
-        });
-    });
-    </script>
-    
-    </body>
-    </html>
+    <script src="createList.js"></script>
+
+</body>
+
+</html>
