@@ -42,52 +42,32 @@ document.addEventListener("DOMContentLoaded", function () {
         textInput.focus();
     }
 
-    function sendDataToServer() {
-        // Zde byste měli odeslat data na váš backend server, například pomocí AJAX
-
-        // Příklad pomocí Fetch API (potřebujete backend endpoint)
-        fetch('https://example.com/saveData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data: getDataFromForm() }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Zde můžete pracovat s odpovědí od serveru
-                console.log('Success:', data);
-                // Navigace na novou stránku
-                window.location.href = 'novastranka.html';
-            })
-            .catch((error) => {
-                console.error('Error:', error);
+    function saveDataToLocalstorage() {
+        // Získat data z formuláře
+        var formData = [];
+        var formGroups = form.querySelectorAll('.form-group');
+        formGroups.forEach(function (formGroup) {
+            var inputs = formGroup.querySelectorAll('input');
+            var data = {};
+            inputs.forEach(function (input) {
+                data[input.name] = input.value;
             });
-    }
-
-    function getDataFromForm() {
-        // Zde můžete získat data z formuláře
-        var formData = new FormData(form);
-        var data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
+            formData.push(data);
         });
-        return data;
+
+        // Uložit data do localStorage
+        localStorage.setItem('formData', JSON.stringify(formData));
     }
 
     // Přidat nový řádek po kliknutí na tlačítko
     addRowBtn.addEventListener("click", addNewRow);
 
-    // Přidat nový řádek po stisknutí klávesy Enter v posledním poli formuláře
-    form.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Zabránit výchozímu chování klávesy Enter (odeslání formuláře)
-            addNewRow();
-        }
-    });
-
     // Odeslat data na server a přejít na novou stránku po kliknutí na tlačítko "Začít vytvářet"
     startComparingBtn.addEventListener("click", function () {
-        sendDataToServer();
+        // Uložit data do localStorage
+        saveDataToLocalstorage();
+        
+        // Přejít na novou stránku
+        window.location.href = 'compare.html';
     });
 });

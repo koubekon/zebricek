@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="cs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadání Seznamu</title>
+    <link rel="stylesheet" href="styly.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <form class="form-inline" id="myForm">
+            <!-- První řádek formuláře s obrázkem -->
+            <div class="form-group">
+                <div class="d-flex align-items-center">
+
+                    <input type="text" class="form-control" name="item1" placeholder="Položka 1">
+                    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#menuObrazek">Nahrát obrázek</button>
+                    <div id="menuObrazek" class="collapse">
+
+                        <input type="file" class="mr-2" accept="image/*" name="imageFile">
+                        <!-- Input pro načítání souboru -->
+                        <p>NEBO</p>
+                        <input type="text" class="form-control mr-2" name="imageUrl" placeholder="URL obrázku"><!-- Input pro zadání URL -->
+
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tlačítko pro přidání nového řádku -->
+        <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
+        <button type="button" class="btn btn-danger float-right" id="startComparing">Začít vytvářet</button>
+
+    </div>
+
+    <!-- Připojení Bootstrap JS a Popper.js (pro Bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById("myForm");
+            var addRowBtn = document.getElementById("addRowBtn");
+            var startComparingBtn = document.getElementById("startComparing");
+
+            function addNewRow() {
+                // Vytvořit nový řádek formuláře s obrázkem
+                var newItem = document.createElement("div");
+                newItem.className = "form-group";
+
+                var itemContent = document.createElement("div");
+                itemContent.className = "d-flex align-items-center";
+
+                var fileInput = document.createElement("input");
+                fileInput.type = "file";
+                fileInput.accept = "image/*";
+                fileInput.name = "imageFile";
+                fileInput.className = "mr-2";
+
+                var urlInput = document.createElement("input");
+                urlInput.type = "text";
+                urlInput.className = "form-control mr-2";
+                urlInput.name = "imageUrl";
+                urlInput.placeholder = "URL obrázku";
+
+                var textInput = document.createElement("input");
+                textInput.type = "text";
+                textInput.className = "form-control";
+                textInput.name = "item" + (form.children.length + 1);
+                textInput.placeholder = "Položka " + (form.children.length + 1);
+
+                // Přidat vstupy do nového řádku
+                itemContent.appendChild(textInput);
+                itemContent.appendChild(fileInput);
+                itemContent.appendChild(urlInput);
+                newItem.appendChild(itemContent);
+
+                // Přidat nový řádek do formuláře
+                form.appendChild(newItem);
+
+                // Focus na nově přidaný vstup pro okamžité začátky psaní
+                textInput.focus();
+            }
+
+            function saveDataToLocalstorage() {
+                // Získat data z formuláře
+                var formData = [];
+                var formGroups = form.querySelectorAll('.form-group');
+                formGroups.forEach(function (formGroup) {
+                    var inputs = formGroup.querySelectorAll('input');
+                    var data = {};
+                    inputs.forEach(function (input) {
+                        data[input.name] = input.value;
+                    });
+                    formData.push(data);
+                });
+
+                // Uložit data do localStorage
+                localStorage.setItem('formData', JSON.stringify(formData));
+            }
+
+            // Přidat nový řádek po kliknutí na tlačítko
+            addRowBtn.addEventListener("click", addNewRow);
+
+            // Odeslat data na server a přejít na novou stránku po kliknutí na tlačítko "Začít vytvářet"
+            startComparingBtn.addEventListener("click", function () {
+                // Uložit data do localStorage
+                saveDataToLocalstorage();
+                
+                // Přejít na novou stránku
+                window.location.href = 'compare.html';
+            });
+        });
+    </script>
+
+</body>
+
+</html>
