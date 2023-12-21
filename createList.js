@@ -1,93 +1,84 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var form = document.getElementById("myForm");
-    var addRowBtn = document.getElementById("addRowBtn");
-    var startComparingBtn = document.getElementById("startComparing");
+  var form = document.getElementById("myForm");
+  var addRowBtn = document.getElementById("addRowBtn");
+  var startComparingBtn = document.getElementById("startComparing");
+  var db;
 
-    function addNewRow() {
-        // Vytvořit nový řádek formuláře s obrázkem
-        var newItem = document.createElement("div");
-        newItem.className = "form-group";
+  // Otevřít nebo vytvořit databázi
+  var request = indexedDB.open("MyDatabase", 1);
 
-        var itemContent = document.createElement("div");
-        itemContent.className = "d-flex align-items-center";
+  request.onupgradeneeded = function (event) {
+    db = event.target.result;
+    var objectStore = db.createObjectStore("formData", { keyPath: "id", autoIncrement: true });
+    objectStore.createIndex("item", "item", { unique: false });
+    objectStore.createIndex("imageFile", "imageFile", { unique: false });
+    objectStore.createIndex("imageUrl", "imageUrl", { unique: false });
+  };
 
-        var fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*";
-        fileInput.name = "imageFile";
-        fileInput.className = "mr-2";
+  request.onsuccess = function (event) {
+    db = event.target.result;
+  };
 
-        var urlInput = document.createElement("input");
-        urlInput.type = "text";
-        urlInput.className = "form-control mr-2";
-        urlInput.name = "imageUrl";
-        urlInput.placeholder = "URL obrázku";
+  function addNewRowToDB(item) {
+    var transaction = db.transaction(["formData"], "readwrite");
+    var objectStore = transaction.objectStore("formData");
 
-        var textInput = document.createElement("input");
-        textInput.type = "text";
-        textInput.className = "form-control";
-        textInput.name = "item" + (form.children.length + 1);
-        textInput.placeholder = "Položka " + (form.children.length + 1);
+    var request = objectStore.add(item);
 
-        // Přidat vstupy do nového řádku
-        itemContent.appendChild(textInput);
-        itemContent.appendChild(fileInput);
-        itemContent.appendChild(urlInput);
-        newItem.appendChild(itemContent);
+    request.onsuccess = function (event) {
+      console.log("Nová položka byla úspěšně přidána do databáze.");
+    };
 
-        // Přidat nový řádek do formuláře
-        form.appendChild(newItem);
+    request.onerror = function (event) {
+      console.error("Nastala chyba při přidávání nové položky do databáze.");
+    };
+  }
 
-        // Focus na nově přidaný vstup pro okamžité začátky psaní
-        textInput.focus();
-    }
-
-    function sendDataToServer() {
-        // Zde byste měli odeslat data na váš backend server, například pomocí AJAX
-
-        // Příklad pomocí Fetch API (potřebujete backend endpoint)
-        fetch('https://example.com/saveData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ data: getDataFromForm() }),
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Zde můžete pracovat s odpovědí od serveru
-                console.log('Success:', data);
-                // Navigace na novou stránku
-                window.location.href = 'novastranka.html';
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-
-    function getDataFromForm() {
-        // Zde můžete získat data z formuláře
-        var formData = new FormData(form);
-        var data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-        return data;
-    }
-
-    // Přidat nový řádek po kliknutí na tlačítko
-    addRowBtn.addEventListener("click", addNewRow);
-
-    // Přidat nový řádek po stisknutí klávesy Enter v posledním poli formuláře
-    form.addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Zabránit výchozímu chování klávesy Enter (odeslání formuláře)
-            addNewRow();
-        }
+  function saveDataToLocalstorage() {
+    var formData = [];
+    var formGroups = form.querySelectorAll('.form-group');
+    formGroups.forEach(function (formGroup) {
+      var inputs = formGroup.querySelectorAll('input');
+      var data = {};
+      inputs.forEach(function (input) {
+        data[input.name] = input.value;
+      });
+      formData.push(data);
     });
 
-    // Odeslat data na server a přejít na novou stránku po kliknutí na tlačítko "Začít vytvářet"
-    startComparingBtn.addEventListener("click", function () {
-        sendDataToServer();
+    formData.forEach(function (item) {
+      addNewRowToDB(item);
     });
+  }
+
+  addRowBtn.addEventListener("click", function () {
+    // Přidat nový řádek do formuláře
+    var newItem = document.createElement("div");
+    newItem.className = "form-group";
+
+    var textInput = document.createElement("input");
+    textInput.type = "text";
+    textInput.className = "form-control";
+    textInput.name = "item";
+    textInput.placeholder = "Položka " + (form.children.length + 1);
+
+    // Přidat vstupy do nového řádku
+    newItem.appendChild(textInput);
+    form.appendChild(newItem);
+
+    // Focus na nově přidaný vstup pro okamžité začátky psaní
+    textInput.focus();
+  });
+
+  form.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      addRowBtn.click();
+    }
+  });
+
+  startComparingBtn.addEventListener("click", function () {
+    saveDataToLocalstorage();
+    window.location.href = 'compare.html';
+  });
 });
