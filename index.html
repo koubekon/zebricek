@@ -14,30 +14,23 @@
     <div class="container mt-5">
         <form class="form-inline" id="myForm">
             <!-- První řádek formuláře s obrázkem -->
-            <div class="form-group">
+            <div class="form-group col-md-6 mb-3">
                 <div class="d-flex align-items-center">
-
                     <input type="text" class="form-control" name="item1" placeholder="Položka 1">
-                    <button type="button" class="btn btn-primary" data-toggle="collapse"
-                        data-target="#menuObrazek">Nahrát obrázek</button>
-                    <div id="menuObrazek" class="collapse">
-                        
-                            <input type="file" class="mr-2" accept="image/*" name="imageFile">
-                            <!-- Input pro načítání souboru -->
-                            <p>NEBO</p>
-                            <input type="text" class="form-control mr-2" name="imageUrl"
-                                placeholder="URL obrázku"><!-- Input pro zadání URL -->
-                        
-                    </div>
+                </div>
+            </div>
+            <div class="form-group col-md-6 mb-3">
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control" name="item1" placeholder="Položka 1">
                 </div>
             </div>
         </form>
-        
-            <!-- Tlačítko pro přidání nového řádku -->
-            <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
-            <button type="button" class="btn btn-danger float-right" id="startComparing">Začít vytvářet</button>
-       
-            </div>
+
+        <!-- Tlačítko pro přidání nového řádku -->
+        <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
+        <button type="button" class="btn btn-danger float-right" id="startComparing">Začít vytvářet</button>
+
+    </div>
 
     <!-- Připojení Bootstrap JS a Popper.js (pro Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
