@@ -1,4 +1,3 @@
-// comparison.js
 var comparisonPairs = [];
 var currentPairIndex = 0;
 
@@ -6,7 +5,7 @@ function vote(pairIndex, winner) {
     var currentPair = comparisonPairs[pairIndex];
 
     // Přičti bod vítězi do databáze
-    updateWinnerScore(currentPair["item" + winner].value);
+    updateWinnerScore(currentPair["item" + winner].name);
 
     currentPair.winner = winner;
     currentPairIndex++;
@@ -24,8 +23,8 @@ function showComparisonPair(pair, pairIndex, allPairs) {
     var item1Div = document.querySelector(".comparison-pair .item:nth-child(1)");
     var item2Div = document.querySelector(".comparison-pair .item:nth-child(2)");
 
-    item1Div.innerHTML = pair.item1.value;
-    item2Div.innerHTML = pair.item2.value;
+    item1Div.innerHTML = pair.item1.name;
+    item2Div.innerHTML = pair.item2.name;
 }
 
 function finishComparison() {
@@ -39,7 +38,7 @@ function finishComparison() {
     // window.location.href = "nextPage.html";
 }
 
-function updateWinnerScore(winnerValue) {
+function updateWinnerScore(winnerName) {
     var db;
     var request = indexedDB.open("myDatabase", 1);
 
@@ -49,7 +48,10 @@ function updateWinnerScore(winnerValue) {
         var transaction = db.transaction(["items"], "readwrite");
         var objectStore = transaction.objectStore("items");
 
-        var getRequest = objectStore.get(winnerValue);
+        var index = objectStore.index("item");
+
+        // Získání záznamu vítězné položky pomocí jména
+        var getRequest = index.get(winnerName);
 
         getRequest.onsuccess = function () {
             var winnerItem = getRequest.result;

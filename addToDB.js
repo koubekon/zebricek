@@ -1,4 +1,3 @@
-// createList.js
 document.addEventListener("DOMContentLoaded", function () {
     // Zachycení události kliknutí na tlačítko "Začít vytvářet"
     document.getElementById("startComparing").addEventListener("click", function () {
@@ -15,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Procházení všech inputů ve formuláři a přidání hodnot do pole
             var inputElements = document.querySelectorAll("#myForm input");
             inputElements.forEach(function (input) {
-                items.push(input.value);
+                items.push({ name: input.value, score: 0 });
             });
 
             // Otevření nebo vytvoření databáze a tabulky
@@ -23,7 +22,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
             request.onupgradeneeded = function (event) {
                 var db = event.target.result;
-                var objectStore = db.createObjectStore("items", { keyPath: "item", autoIncrement: true });
+                var objectStore = db.createObjectStore("items", { keyPath: "id", autoIncrement: true });
+                objectStore.createIndex("name", "name", { unique: false });
+                objectStore.createIndex("score", "score", { unique: false });
             };
 
             request.onsuccess = function (event) {
@@ -34,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var objectStore = transaction.objectStore("items");
 
                 items.forEach(function (item) {
-                    objectStore.add({ value: item });
+                    objectStore.add(item);
                 });
 
                 transaction.oncomplete = function () {
