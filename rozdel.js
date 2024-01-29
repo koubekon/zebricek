@@ -2,10 +2,13 @@ let pole = [
     { nazev: 'jablko', body: 0 },
     { nazev: 'banán', body: 0 },
     { nazev: 'pomeranč', body: 0 },
-
+    { nazev: 'grep', body: 0 },
+    // { nazev: 'pomelo', body: 0 },
 ];
-let pocet = pole.length;
-console.log(pocet);
+let pocetOdehranych = 0;
+let historie = [];
+let pocetKol = spocitejKola(pole.length);
+console.log(pocetKol);
 aktualizujStranku();
 
 
@@ -13,13 +16,17 @@ aktualizujStranku();
 
 // document.getElementById('prvni').innerHTML = dvojice[0].nazev;
 // document.getElementById('druhy').innerHTML = dvojice[1].nazev;
-
-
-
+function spocitejKola(vPoli) {
+    let kola = 0;
+    for (let i = (vPoli - 1); i > 0; i--) {
+        kola = kola + i;
+    }
+    return kola;
+}
 
 function vytvorDvojici(pole) {
     // Seřadíme položky podle bodů
-    
+
     let seradit = pole.slice().sort((a, b) => a.body - b.body);
     let pom = 0;
 
@@ -28,7 +35,7 @@ function vytvorDvojici(pole) {
     let kandidati = seradit.filter(item => item.body === min);
 
     // Pokud zbývá pouze jedna položka s nejmenším počtem bodů, přejdeme k dalším
-    
+
     while (kandidati.length === 1) {
         pom++;
         let druhyMin = seradit[pom].body;
@@ -38,31 +45,51 @@ function vytvorDvojici(pole) {
     // Náhodný výběr dvojice z kandidátů
     let index1 = Math.floor(Math.random() * kandidati.length);
     let index2;
+
     do {
         index2 = Math.floor(Math.random() * kandidati.length);
     } while (index1 === index2);
-// Zkusit přidat pomocnou tabulku na zapamatování, kdo vyhrál
+
     return [kandidati[index1], kandidati[index2]];
 }
 
 
 function pridejBod(nazev) {
     let vitez = pole.find(item => item.nazev === nazev);
-        vitez.body++;
+    vitez.body++;
+    let posledniIndex = historie.length - 1;
+    historie[posledniIndex].vitezi = vitez.nazev;
     
     console.log(pole);
+    console.log(historie);
     aktualizujStranku();
 }
 
-function aktualizujStranku() {
-    let dvojice = vytvorDvojici(pole);
-    let prvniDiv = document.getElementById('prvni');
-    let druhyDiv = document.getElementById('druhy');
+function zapisHistorii(prvniPrvek, druhyPrvek) {
+    let zapis = { "prvni": prvniPrvek, "druhy": druhyPrvek, "vitezi": null }
+    historie.push(zapis);
 
-    prvniDiv.innerHTML = dvojice[0].nazev;
-    druhyDiv.innerHTML = dvojice[1].nazev;
- 
-    // Nastavení onClick eventů pro nově vygenerované položky
-    prvniDiv.onclick = function() { pridejBod(dvojice[0].nazev); };
-    druhyDiv.onclick = function() { pridejBod(dvojice[1].nazev); };
+}
+
+function aktualizujStranku() {
+    if (pocetOdehranych === pocetKol) {
+        console.log("konec");
+        //window.location.href = "winner.html";
+
+    } else {
+        let dvojice = vytvorDvojici(pole);
+        let prvniDiv = document.getElementById('prvni');
+        let druhyDiv = document.getElementById('druhy');
+
+        prvniDiv.innerHTML = dvojice[0].nazev;
+        druhyDiv.innerHTML = dvojice[1].nazev;
+
+        zapisHistorii(dvojice[0].nazev, dvojice[1].nazev);
+
+        prvniDiv.onclick = function () { pridejBod(dvojice[0].nazev); };
+        druhyDiv.onclick = function () { pridejBod(dvojice[1].nazev); };
+        // počítání proběhlých kol
+        pocetOdehranych++;
+    }
+
 }
