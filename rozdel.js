@@ -74,7 +74,9 @@ function aktualizujStranku() {
         let dvojice = vytvorDvojici(pole);
         let uzHrali = false;
         let kdoUzVyhral = null;
+
         // Kontrola, jestli už tato dvojice spolu nehrála
+
         for (let j = 0; j < historie.length; j++) {
 
             if (historie[j].prvni === dvojice[0].nazev || historie[j].prvni === dvojice[1].nazev) {
@@ -116,7 +118,6 @@ function aktualizujStranku() {
 
             prvniDiv.onclick = function () { pridejBod(dvojice[0].nazev); };
             druhyDiv.onclick = function () { pridejBod(dvojice[1].nazev); };
-            // počítání proběhlých kol
             pocetOdehranych++;
         }
     }
