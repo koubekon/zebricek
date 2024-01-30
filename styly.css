@@ -5,8 +5,19 @@
 
 }
 
-#prvni #druhy {
-text-align: center;
-font-size: large;
+#odsazeni {
+    padding-top: 30%;
+}
 
+#prvni, #druhy {
+    height: 150px;
+   font-size: xx-large;
+   transition: background 0.2s;
+}
+
+#prvni:hover, #druhy:hover {
+    background-color: grey;
+    color: white;
+    height: 150px;
+   font-size: xx-large;
 }
