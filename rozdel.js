@@ -2,20 +2,14 @@ let pole = [
     { nazev: 'jablko', body: 0 },
     { nazev: 'banán', body: 0 },
     { nazev: 'pomeranč', body: 0 },
-    { nazev: 'grep', body: 0 },
+    //{ nazev: 'grep', body: 0 },
     // { nazev: 'pomelo', body: 0 },
 ];
 let pocetOdehranych = 0;
 let historie = [];
 let pocetKol = spocitejKola(pole.length);
-console.log(pocetKol);
 aktualizujStranku();
 
-
-// console.log('Náhodná dvojice:', dvojice);
-
-// document.getElementById('prvni').innerHTML = dvojice[0].nazev;
-// document.getElementById('druhy').innerHTML = dvojice[1].nazev;
 function spocitejKola(vPoli) {
     let kola = 0;
     for (let i = (vPoli - 1); i > 0; i--) {
@@ -59,8 +53,8 @@ function pridejBod(nazev) {
     vitez.body++;
     let posledniIndex = historie.length - 1;
     historie[posledniIndex].vitezi = vitez.nazev;
-    
-    console.log(pole);
+
+    // console.log(pole);
     console.log(historie);
     aktualizujStranku();
 }
@@ -74,22 +68,57 @@ function zapisHistorii(prvniPrvek, druhyPrvek) {
 function aktualizujStranku() {
     if (pocetOdehranych === pocetKol) {
         console.log("konec");
-        //window.location.href = "winner.html";
+        // window.location.href = "winner.html";
 
     } else {
         let dvojice = vytvorDvojici(pole);
-        let prvniDiv = document.getElementById('prvni');
-        let druhyDiv = document.getElementById('druhy');
+        let uzHrali = false;
+        let kdoUzVyhral = null;
+        // Kontrola, jestli už tato dvojice spolu nehrála
+        for (let j = 0; j < historie.length; j++) {
 
-        prvniDiv.innerHTML = dvojice[0].nazev;
-        druhyDiv.innerHTML = dvojice[1].nazev;
+            if (historie[j].prvni === dvojice[0].nazev || historie[j].prvni === dvojice[1].nazev) {
 
-        zapisHistorii(dvojice[0].nazev, dvojice[1].nazev);
+                if (historie[j].prvni === dvojice[0].nazev) {
 
-        prvniDiv.onclick = function () { pridejBod(dvojice[0].nazev); };
-        druhyDiv.onclick = function () { pridejBod(dvojice[1].nazev); };
-        // počítání proběhlých kol
-        pocetOdehranych++;
+                    if (historie[j].druhy === dvojice[1].nazev) {
+                        
+                        uzHrali = true;
+                        kdoUzVyhral = historie[j].vitezi;
+                        break;
+                    }
+                } else {
+
+                    if (historie[j].druhy === dvojice[0].nazev) {
+                        uzHrali = true;
+                        kdoUzVyhral = historie[j].vitezi;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (uzHrali === true) {
+
+            zapisHistorii(dvojice[0].nazev, dvojice[1].nazev);
+            pocetOdehranych++;
+            pridejBod(kdoUzVyhral);
+        } else {
+
+
+            let prvniDiv = document.getElementById('prvni');
+            let druhyDiv = document.getElementById('druhy');
+
+            prvniDiv.innerHTML = dvojice[0].nazev;
+            druhyDiv.innerHTML = dvojice[1].nazev;
+
+            zapisHistorii(dvojice[0].nazev, dvojice[1].nazev);
+
+            prvniDiv.onclick = function () { pridejBod(dvojice[0].nazev); };
+            druhyDiv.onclick = function () { pridejBod(dvojice[1].nazev); };
+            // počítání proběhlých kol
+            pocetOdehranych++;
+        }
     }
 
 }
