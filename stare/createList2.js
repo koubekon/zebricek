@@ -11,18 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var itemContent = document.createElement("div");
         itemContent.className = "d-flex align-items-center";
 
-        var fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = "image/*";
-        fileInput.name = "imageFile";
-        fileInput.className = "mr-2";
-
-        var urlInput = document.createElement("input");
-        urlInput.type = "text";
-        urlInput.className = "form-control mr-2";
-        urlInput.name = "imageUrl";
-        urlInput.placeholder = "URL obrázku";
-
+             
         var textInput = document.createElement("input");
         textInput.type = "text";
         textInput.className = "form-control";
@@ -31,9 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Přidat vstupy do nového řádku
         itemContent.appendChild(textInput);
-        itemContent.appendChild(fileInput);
-        itemContent.appendChild(urlInput);
-        newItem.appendChild(itemContent);
+             newItem.appendChild(itemContent);
 
         // Přidat nový řádek do formuláře
         form.appendChild(newItem);
