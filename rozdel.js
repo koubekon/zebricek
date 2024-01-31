@@ -53,8 +53,7 @@ function pridejBod(nazev) {
     vitez.body++;
     let posledniIndex = historie.length - 1;
     historie[posledniIndex].vitezi = vitez.nazev;
-
-    // console.log(pole);
+    // smazat
     console.log(historie);
     aktualizujStranku();
 }
