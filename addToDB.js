@@ -12,7 +12,7 @@ class DatabaseManager {
             request.onupgradeneeded = event => {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains('items')) {
-                    db.createObjectStore('items', { keyPath: 'id' });
+                    db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
                 }
             };
 
@@ -28,7 +28,7 @@ class DatabaseManager {
         });
     }
 
-    addItems() {
+    pridejPolozky() {
         return new Promise((resolve, reject) => {
             const items = [];
             const inputElements = document.querySelectorAll("#myForm input");
@@ -44,7 +44,7 @@ class DatabaseManager {
 
             const transaction = this.db.transaction(["items"], "readwrite");
             const objectStore = transaction.objectStore("items");
-
+            console.log(items);
             items.forEach(item => objectStore.add(item));
 
             transaction.oncomplete = () => {
@@ -58,13 +58,61 @@ class DatabaseManager {
             };
         });
     }
+
+    nactiData() {
+        return new Promise((resolve, reject) => {
+            let openRequest = indexedDB.open('zebricek', 1);
+
+            openRequest.onupgradeneeded = () => {
+                // Pokud databáze ještě neexistuje, vytvoří se
+                openRequest.result.createObjectStore('items', { keyPath: 'id' });
+            };
+
+            openRequest.onerror = () => {
+                reject(openRequest.error);
+            };
+
+            openRequest.onsuccess = () => {
+                let db = openRequest.result;
+                let transaction = db.transaction('items', 'readonly');
+                let store = transaction.objectStore('items');
+                let request = store.getAll();
+
+                request.onerror = () => {
+                    reject(request.error);
+                };
+
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+            };
+        });
+    }
+
+   vypisSeznam(pole) {
+    this.pole = pole.map(polozka => new Polozka(polozka.nazev, polozka.body));
+    let seznam = document.getElementById("seznam");
+        this.pole.sort((a, b) => a.body - b.body);
+        for (let i = 0; i < pole.length; i++) {
+            let polozkaSeznamu = document.createElement("li");
+            polozkaSeznamu.className = "list-group-item border-0 round";
+            polozkaSeznamu.id = "polozka-" + i;
+            polozkaSeznamu.textContent = pole[i];
+            seznam.appendChild(polozkaSeznamu);
+        }
+    }
+    
 }
 
-const dbManager = new DatabaseManager("zebricek", 1);
-document.getElementById("startComparing").addEventListener("click", () => {
-    dbManager.addItems().then(() => {
-        window.location.href = "compare.html";
-    });
-});
 
+class Polozka {
+    constructor(nazev, body) {
+        this.nazev = nazev;
+        this.body = body;
+
+    }
+    pridejBod() {
+        this.body++;
+    }
+}
 

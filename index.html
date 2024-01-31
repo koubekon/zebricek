@@ -19,7 +19,7 @@
                     <input type="text" class="form-control" name="item1" placeholder="Položka 1">
                 </div>
             </div>
-                    </form>
+        </form>
 
         <!-- Tlačítko pro přidání nového řádku -->
         <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
@@ -33,7 +33,14 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="createList.js"></script>
     <script src="addToDB.js"></script>
-
+    <script>
+        const databaze = new DatabaseManager("zebricek", 1);
+        databaze.init();
+        document.getElementById("startComparing").addEventListener("click", () => {
+            databaze.pridejPolozky().then(() => {
+                window.location.href = "compare.html";
+            });
+        });</script>
 </body>
 
 </html>

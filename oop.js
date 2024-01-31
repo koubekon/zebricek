@@ -73,8 +73,8 @@ class Hra {
 
     aktualizujStranku() {
         if (this.pocetOdehranych === this.pocetKol) {
-            console.log("konec");
-            // window.location.href = "winner.html";
+            //console.log("konec");
+            window.location.href = "winner.html";
 
         } else {
             let dvojice = this.vytvorDvojici(this.pole);
@@ -129,12 +129,4 @@ class Hra {
         }
     }
 }
-// Vytvoření instance Hry
-let pole = [
-    { nazev: 'jablko', body: 0 },
-    { nazev: 'banán', body: 0 },
-    { nazev: 'pomeranč', body: 0 }
-];
 
-let hra = new Hra(pole);
-hra.aktualizujStranku();
