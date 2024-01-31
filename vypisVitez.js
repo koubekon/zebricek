@@ -6,7 +6,7 @@
 
         for (var i = 0; i < pole.length; i++) {
             var polozkaSeznamu = document.createElement("li");
-            polozkaSeznamu.className = "list-group-item border-0";
+            polozkaSeznamu.className = "list-group-item border-0 round";
             polozkaSeznamu.id = "polozka-" + i;
             polozkaSeznamu.textContent = pole[i];
             seznam.appendChild(polozkaSeznamu);

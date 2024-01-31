@@ -1,58 +1,70 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // Zachycení události kliknutí na tlačítko "Začít vytvářet"
-    document.getElementById("startComparing").addEventListener("click", function () {
-        // Uložení do IndexedDB a po dokončení přesměrování na compare.html
-        saveToIndexedDB().then(function () {
-            window.location.href = "compare.html";
-        });
-    });
 
-    function saveToIndexedDB() {
-        return new Promise(function (resolve, reject) {
-            var items = [];
+class DatabaseManager {
+    constructor(dbName, dbVersion) {
+        this.dbName = dbName;
+        this.dbVersion = dbVersion;
+    }
 
-            // Procházení všech inputů ve formuláři a přidání hodnot do pole
-            var inputElements = document.querySelectorAll("#myForm input");
-            inputElements.forEach(function (input) {
-                items.push({ name: input.value, score: 0 });
-            });
+    init() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(this.dbName, this.dbVersion);
 
-            // Otevření nebo vytvoření databáze a tabulky
-            var request = indexedDB.open("myDatabase", 1);
-
-            request.onupgradeneeded = function (event) {
-                var db = event.target.result;
-                var objectStore = db.createObjectStore("items", { keyPath: "id", autoIncrement: true });
-                objectStore.createIndex("name", "name", { unique: false });
-                objectStore.createIndex("score", "score", { unique: false });
+            request.onupgradeneeded = event => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('items')) {
+                    db.createObjectStore('items', { keyPath: 'id' });
+                }
             };
 
-            request.onsuccess = function (event) {
-                var db = event.target.result;
-
-                // Otevření transakce a přidání dat do tabulky
-                var transaction = db.transaction(["items"], "readwrite");
-                var objectStore = transaction.objectStore("items");
-
-                items.forEach(function (item) {
-                    objectStore.add(item);
-                });
-
-                transaction.oncomplete = function () {
-                    console.log("Položky byly úspěšně uloženy do IndexedDB.");
-                    resolve(); // Promise je dokončen
-                };
-
-                transaction.onerror = function (error) {
-                    console.error("Chyba při ukládání do IndexedDB: ", error);
-                    reject(error); // Promise s chybou
-                };
+            request.onsuccess = event => {
+                this.db = event.target.result;
+                resolve();
             };
 
-            request.onerror = function (event) {
-                console.error("Nepodařilo se otevřít nebo vytvořit databázi: ", event.target.error);
-                reject(event.target.error); // Promise s chybou
+            request.onerror = event => {
+                console.error('Database error:', event.target.errorCode);
+                reject(event.target.errorCode);
             };
         });
     }
+
+    addItems() {
+        return new Promise((resolve, reject) => {
+            const items = [];
+            const inputElements = document.querySelectorAll("#myForm input");
+            inputElements.forEach(input => {
+                items.push({ nazev: input.value, body: 0 });
+            });
+
+            // Ensure the database is initialized
+            if (!this.db) {
+                reject('Database not initialized');
+                return;
+            }
+
+            const transaction = this.db.transaction(["items"], "readwrite");
+            const objectStore = transaction.objectStore("items");
+
+            items.forEach(item => objectStore.add(item));
+
+            transaction.oncomplete = () => {
+                console.log("Items successfully saved to IndexedDB.");
+                resolve();
+            };
+
+            transaction.onerror = error => {
+                console.error("Error saving to IndexedDB:", error);
+                reject(error);
+            };
+        });
+    }
+}
+
+const dbManager = new DatabaseManager("zebricek", 1);
+document.getElementById("startComparing").addEventListener("click", () => {
+    dbManager.addItems().then(() => {
+        window.location.href = "compare.html";
+    });
 });
+
+

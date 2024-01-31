@@ -21,3 +21,20 @@
     height: 150px;
    font-size: xx-large;
 }
+
+#polozka-0 {
+font-size: xx-large;
+font-weight: 700;
+background-color: gold;
+}
+#polozka-1 {
+    font-size: larger;
+    font-weight: 600;
+    background-color: silver;
+    }
+    #polozka-2 {
+        font-size: large;
+        font-weight: 400;
+        background-color: brown;
+        color: white;
+        }
