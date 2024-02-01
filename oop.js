@@ -54,15 +54,24 @@ class Hra {
         return [kandidati[index1], kandidati[index2]];
     }
 
-
     pridejBod(nazev) {
         let vitez = this.pole.find(item => item.nazev === nazev);
         vitez.body++;
-        let posledniIndex = this.historie.length - 1;
-        this.historie[posledniIndex].vitezi = vitez.nazev;
-        // smazat
-        console.log(this.historie);
-        this.aktualizujStranku();
+
+        // Odešlete aktualizaci bodů do databáze
+        databaze.odesliData(nazev, vitez.body)
+            .then(() => {
+                console.log("Body successfully updated in the database.");
+                let posledniIndex = this.historie.length - 1;
+                this.historie[posledniIndex].vitezi = vitez.nazev;
+                // smazat
+                console.log(this.historie);
+                this.aktualizujStranku();
+            })
+            .catch(error => {
+                console.error("Error updating body in the database:", error);
+                // Zpracujte chybu, např. informujte uživatele nebo provedte jiné akce
+            });
     }
 
     zapisHistorii(prvniPrvek, druhyPrvek) {

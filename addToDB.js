@@ -89,6 +89,42 @@ class DatabaseManager {
         });
     }
 
+    odesliData(nazev, noveBody) {
+        return new Promise((resolve, reject) => {
+            // Ensure the database is initialized
+            if (!this.db) {
+                reject('Database not initialized');
+                return;
+            }
+
+            const transaction = this.db.transaction(["items"], "readwrite");
+            const objectStore = transaction.objectStore("items");
+
+            const getRequest = objectStore.get(nazev);
+            getRequest.onsuccess = function(event) {
+                const data = event.target.result;
+                if (data) {
+                    data.body = noveBody;
+                    const updateRequest = objectStore.put(data);
+                    updateRequest.onsuccess = function(event) {
+                        console.log("Body successfully updated for item:", nazev);
+                        resolve();
+                    };
+                    updateRequest.onerror = function(event) {
+                        console.error("Error updating body for item:", nazev);
+                        reject(event.target.error);
+                    };
+                } else {
+                    reject(`Item with name '${nazev}' not found`);
+                }
+            };
+
+            transaction.onerror = function(event) {
+                console.error("Error updating body for item:", nazev);
+                reject(event.target.error);
+            };
+        });
+    }
    vypisSeznam(pole) {
     this.pole = pole.map(polozka => new Polozka(polozka.nazev, polozka.body));
     let seznam = document.getElementById("seznam");
@@ -97,22 +133,11 @@ class DatabaseManager {
             let polozkaSeznamu = document.createElement("li");
             polozkaSeznamu.className = "list-group-item border-0 round";
             polozkaSeznamu.id = "polozka-" + i;
-            polozkaSeznamu.textContent = pole[i];
+            polozkaSeznamu.textContent = pole[i].nazev;
             seznam.appendChild(polozkaSeznamu);
         }
     }
     
 }
 
-
-class Polozka {
-    constructor(nazev, body) {
-        this.nazev = nazev;
-        this.body = body;
-
-    }
-    pridejBod() {
-        this.body++;
-    }
-}
 
