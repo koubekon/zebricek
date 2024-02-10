@@ -12,7 +12,7 @@ class DatabaseManager {
             request.onupgradeneeded = event => {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains('items')) {
-                    db.createObjectStore('items', { keyPath: 'id', autoIncrement: true });
+                    db.createObjectStore('items', { keyPath: 'nazev', autoIncrement: false });
                 }
             };
 
@@ -67,7 +67,7 @@ class DatabaseManager {
 
             openRequest.onupgradeneeded = () => {
                 // Pokud databáze ještě neexistuje, vytvoří se
-                openRequest.result.createObjectStore('items', { keyPath: 'id' });
+                openRequest.result.createObjectStore('items', { keyPath: 'nazev' });
             };
 
             openRequest.onerror = () => {
@@ -91,7 +91,7 @@ class DatabaseManager {
         });
     }
 
-    odesliData(poleAktualizaci) {
+    odesliData(data) {
         return new Promise((resolve, reject) => {
             // Ensure the database is initialized
             if (!this.db) {
@@ -100,44 +100,20 @@ class DatabaseManager {
             }
     
             const transaction = this.db.transaction(["items"], "readwrite");
-            const objectStore = transaction.objectStore("items");
-    
+            const store = transaction.objectStore("items");
+   // store.clear();
             // Projdeme všechny položky v poli aktualizace
-            poleAktualizaci.forEach(function(itemToUpdate) {
-                console.log(itemToUpdate);
-                const getRequest = objectStore.get(itemToUpdate.nazev);
-
-                getRequest.onsuccess = function(event) {
-                    console.log("fired", event.target);
-                    const data = event.target.result;
-                    console.log(data);
-    
-                    if (data) {
-                        // Aktualizace hodnoty "body" na základě hodnoty v poli aktualizace
-                        console.log("data.body", data.body)
-                        data.body = itemToUpdate.body;
-    
-                        // Uložení aktualizované položky zpět do objektového obchodu
-                        const updateRequest = objectStore.put(data);
-    
-                        updateRequest.onsuccess = function() {
-                            console.log("Body successfully updated for item:", itemToUpdate.nazev);
-                        };
-    
-                        updateRequest.onerror = function(event) {
-                            console.error("Error updating body for item:", itemToUpdate.nazev);
-                            reject(event.target.error);
-                        };
-                    } else {
-                        reject(`Item with name '${itemToUpdate.nazev}' not found`);
-                    }
+            for (const item of data) {
+                const request = store.put(item);
+        
+                request.onsuccess = () => {
+                  resolve();
                 };
-    
-                getRequest.onerror = function(event) {
-                    console.error("Error fetching item:", event.target.error);
-                    reject(event.target.error);
+        
+                request.onerror = (event) => {
+                  reject(event.target.error);
                 };
-            });
+              }
     
             transaction.oncomplete = function() {
                 console.log("Bodies successfully updated for all items");
@@ -154,9 +130,9 @@ class DatabaseManager {
     
 
    vypisSeznam(pole) {
-    this.pole = pole.map(polozka => new Polozka(polozka.nazev, polozka.body));
+    
     let seznam = document.getElementById("seznam");
-        this.pole.sort((a, b) => a.body - b.body);
+        pole.sort((a, b) => b.body - a.body);
         for (let i = 0; i < pole.length; i++) {
             let polozkaSeznamu = document.createElement("li");
             polozkaSeznamu.className = "list-group-item border-0 round";

@@ -76,9 +76,10 @@ class Hra {
 
     aktualizujStranku() {
         if (this.pocetOdehranych === this.pocetKol) {
-            console.log(this.pole);
-            console.log("konec");
-            return;
+            databaze.odesliData(this.pole).then(() => {
+                window.location.href = "winner.html";             
+            });
+          
 
         } else {
             let dvojice = this.vytvorDvojici(this.pole);

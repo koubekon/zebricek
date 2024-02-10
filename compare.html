@@ -24,19 +24,16 @@
     <script>
 
         const databaze = new DatabaseManager("zebricek", 1);
+        const vysledek = [];
         databaze.init();
             databaze.nactiData().then(pole => {
                 let hra = new Hra(pole);
-                hra.aktualizujStranku()
-                databaze.odesliData(pole).then(() => {
-                window.location.href = "winner.html";             })
-                ;
-                
+                hra.aktualizujStranku();
+                                
             }).catch(error => {
                 console.error('Chyba při načítání dat z IndexedDB:', error);
-            })
-           
-                ;
+            }) ;
+            
                 
             
            </script>
