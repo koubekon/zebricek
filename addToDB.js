@@ -8,7 +8,7 @@ class DatabaseManager {
     init() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(this.dbName, this.dbVersion);
-
+//sem doplnit mazání nebo zapisování do jiné tabulky
             request.onupgradeneeded = event => {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains('items')) {
@@ -33,7 +33,9 @@ class DatabaseManager {
             const items = [];
             const inputElements = document.querySelectorAll("#myForm input");
             inputElements.forEach(input => {
+                if (input.value) {  
                 items.push({ nazev: input.value, body: 0 });
+            }
             });
 
             // Ensure the database is initialized
@@ -89,42 +91,68 @@ class DatabaseManager {
         });
     }
 
-    odesliData(nazev, noveBody) {
+    odesliData(poleAktualizaci) {
         return new Promise((resolve, reject) => {
             // Ensure the database is initialized
             if (!this.db) {
                 reject('Database not initialized');
                 return;
             }
-
+    
             const transaction = this.db.transaction(["items"], "readwrite");
             const objectStore = transaction.objectStore("items");
+    
+            // Projdeme všechny položky v poli aktualizace
+            poleAktualizaci.forEach(function(itemToUpdate) {
+                console.log(itemToUpdate);
+                const getRequest = objectStore.get(itemToUpdate.nazev);
 
-            const getRequest = objectStore.get(nazev);
-            getRequest.onsuccess = function(event) {
-                const data = event.target.result;
-                if (data) {
-                    data.body = noveBody;
-                    const updateRequest = objectStore.put(data);
-                    updateRequest.onsuccess = function(event) {
-                        console.log("Body successfully updated for item:", nazev);
-                        resolve();
-                    };
-                    updateRequest.onerror = function(event) {
-                        console.error("Error updating body for item:", nazev);
-                        reject(event.target.error);
-                    };
-                } else {
-                    reject(`Item with name '${nazev}' not found`);
-                }
+                getRequest.onsuccess = function(event) {
+                    console.log("fired", event.target);
+                    const data = event.target.result;
+                    console.log(data);
+    
+                    if (data) {
+                        // Aktualizace hodnoty "body" na základě hodnoty v poli aktualizace
+                        console.log("data.body", data.body)
+                        data.body = itemToUpdate.body;
+    
+                        // Uložení aktualizované položky zpět do objektového obchodu
+                        const updateRequest = objectStore.put(data);
+    
+                        updateRequest.onsuccess = function() {
+                            console.log("Body successfully updated for item:", itemToUpdate.nazev);
+                        };
+    
+                        updateRequest.onerror = function(event) {
+                            console.error("Error updating body for item:", itemToUpdate.nazev);
+                            reject(event.target.error);
+                        };
+                    } else {
+                        reject(`Item with name '${itemToUpdate.nazev}' not found`);
+                    }
+                };
+    
+                getRequest.onerror = function(event) {
+                    console.error("Error fetching item:", event.target.error);
+                    reject(event.target.error);
+                };
+            });
+    
+            transaction.oncomplete = function() {
+                console.log("Bodies successfully updated for all items");
+                resolve();
             };
-
+    
             transaction.onerror = function(event) {
-                console.error("Error updating body for item:", nazev);
+                console.error("Error updating bodies for items:", event.target.error);
                 reject(event.target.error);
             };
         });
     }
+    
+    
+
    vypisSeznam(pole) {
     this.pole = pole.map(polozka => new Polozka(polozka.nazev, polozka.body));
     let seznam = document.getElementById("seznam");
