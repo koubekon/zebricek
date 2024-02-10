@@ -10,9 +10,36 @@
 
 </head>
 <body>
-    <div id="prvni" ></div>
-    <div id="druhy" ></div>
+
+    <div class="container-sm " id="obal">
+        <div class="container" id="odsazeni">
+        <div class="row justify-content-between">
+    <div class="col d-flex align-items-center justify-content-center border border-dark rounded shadow-lg" id="prvni" ></div>
+    <div class="col-auto"></div>
+    <div class="col d-flex align-items-center justify-content-center border border-dark rounded shadow-lg" id="druhy" ></div>
+</div>
+        </div>
+    </div>
+    <script src="addToDB.js"></script>
+    <script>
+
+        const databaze = new DatabaseManager("zebricek", 1);
+        const vysledek = [];
+        databaze.init();
+            databaze.nactiData().then(pole => {
+                let hra = new Hra(pole);
+                hra.aktualizujStranku();
+                                
+            }).catch(error => {
+                console.error('Chyba při načítání dat z IndexedDB:', error);
+            }) ;
+            
+                
+            
+           </script>
+    
     <script src="rozdel.js"></script>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
