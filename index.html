@@ -10,37 +10,84 @@
 </head>
 
 <body>
-
-    <div class="container mt-5" id="obal">
-        <form id="myForm">
-            <!-- První řádek formuláře s obrázkem -->
-            <div class="form-group col-md-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <input type="text" class="form-control" name="item1" placeholder="Položka 1">
-                </div>
+    <div class="container-fluid d-flex flex-column">
+        <header class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Vytvoř si vlastní žebříček.</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Přepnout navigaci">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Domů <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Odkazy</a>
+                    </li>
+                </ul>
             </div>
-        </form>
+        </header>
+        <div class="page-content row flex-grow-1">
+            <div class="col-md-9 p-4">
 
-        <!-- Tlačítko pro přidání nového řádku -->
-        <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
-        <button type="button" class="btn btn-danger float-right" id="startComparing">Začít vytvářet</button>
+                <form id="nazev">
+                    <h3>Název žebříčku</h3>
+                    <div class="form-group">
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control" name="nazev" placeholder="Název žebříčku">
+                        </div>
+                    </div>
+                </form>
+                <form id="myForm">
+                    <h3>Položky</h3>
+                    <!-- První řádek formuláře s obrázkem -->
+                    <div class="form-group">
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control" name="item1" placeholder="Položka 1">
+                        </div>
+                    </div>
+                </form>
 
-    </div>
+                <!-- Tlačítko pro přidání nového řádku -->
+                <button type="button" class="btn btn-primary" id="addRowBtn">Přidat položku</button>
+                <button type="button" class="btn btn-danger float-right" id="startComparing">Začít vytvářet</button>
 
-    <!-- Připojení Bootstrap JS a Popper.js (pro Bootstrap) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="createList.js"></script>
-    <script src="addToDB.js"></script>
-    <script>
-        const databaze = new DatabaseManager("zebricek", 1);
-        databaze.init();
-        document.getElementById("startComparing").addEventListener("click", () => {
-            databaze.pridejPolozky().then(() => {
-               window.location.href = "compare.html";
+            </div>
+            <aside class="col-md-3 sidebar justify-content-end">
+                <h3>Historie</h3>
+                <p>Tady je prostor pro postranní panel.</p>
+            </aside>
+        </div>
+        <footer class="page-footer mt-auto">
+            <div class="footer p-3">
+                <p class="text-center">Ondřej Koubek</p>
+            </div>
+        </footer>
+        <!-- Připojení Bootstrap JS a Popper.js (pro Bootstrap) -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+        <script src="createList.js"></script>
+        <script src="addToDB.js"></script>
+        <script>
+            
+            const databaze = new DatabaseManager("zebricek", "items", 1);
+            document.getElementById("startComparing").addEventListener("click", () => {
+
+                    databaze.init().then(() => {
+                        databaze.pridejPolozky()
+                            .then(() => {
+                                window.location.href = "compare.html";
+
+                            })
+                            .catch(error => {
+                                alert(error);
+                           
+                    })
+                })
             });
-        });</script>
+        </script>
 </body>
 
 </html>

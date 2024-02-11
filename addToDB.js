@@ -1,73 +1,69 @@
 
 class DatabaseManager {
-    constructor(dbName, dbVersion) {
+    constructor(dbName, tableName, dbVersion) {
         this.dbName = dbName;
         this.dbVersion = dbVersion;
+        this.tableName = tableName;
+        this.tableNum = 1;
     }
 
-    init() {
+    async init() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open(this.dbName, this.dbVersion);
-//sem doplnit mazání nebo zapisování do jiné tabulky
-            request.onupgradeneeded = event => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains('items')) {
+          const request = indexedDB.open(this.dbName, this.dbVersion);
+    
+          request.onupgradeneeded = event => {
+            const db = event.target.result;
+    if (!db.objectStoreNames.contains('items')) {
                     db.createObjectStore('items', { keyPath: 'nazev', autoIncrement: false });
-                }
-            };
-
-            request.onsuccess = event => {
-                this.db = event.target.result;
-                resolve();
-            };
-
-            request.onerror = event => {
-                console.error('Database error:', event.target.errorCode);
-                reject(event.target.errorCode);
-            };
+}
+          };
+    
+          request.onsuccess = event => {
+            this.db = event.target.result;
+            resolve();
+          };
+    
+          request.onerror = event => {
+            console.error('Database error:', event.target.errorCode);
+            reject(event.target.errorCode);
+          };
         });
-    }
+      }   
 
-    pridejPolozky() {
+    async pridejPolozky() {
         return new Promise((resolve, reject) => {
             const items = [];
             const inputElements = document.querySelectorAll("#myForm input");
+
+            // Kontrola duplicitních hodnot
+            const itemValues = new Set();
             inputElements.forEach(input => {
-                if (input.value) {  
-                items.push({ nazev: input.value, body: 0 });
-            }
+                if (input.value) {
+                    if (itemValues.has(input.value)) {
+                        reject('Duplicitní položky nejsou povoleny.');
+                        return;
+                    }
+                    itemValues.add(input.value);
+                    items.push({ nazev: input.value, body: 0 });
+                }
             });
 
-            // Ensure the database is initialized
-            if (!this.db) {
-                reject('Database not initialized');
-                return;
+            // Odeslání dat, pokud neexistují duplicitní položky
+            if (items.length > 0) {
+                this.odesliData(items).then(resolve, reject);
+            } else {
+                reject('Nebyly zadány žádné platné položky.');
             }
-
-            const transaction = this.db.transaction(["items"], "readwrite");
-            const objectStore = transaction.objectStore("items");
-            console.log(items);
-            items.forEach(item => objectStore.add(item));
-
-            transaction.oncomplete = () => {
-                console.log("Items successfully saved to IndexedDB.");
-                resolve();
-            };
-
-            transaction.onerror = error => {
-                console.error("Error saving to IndexedDB:", error);
-                reject(error);
-            };
         });
     }
 
-    nactiData() {
+    async nactiData() {
         return new Promise((resolve, reject) => {
-            let openRequest = indexedDB.open('zebricek', 1);
+            let openRequest = indexedDB.open(this.dbName, this.dbVersion);
 
             openRequest.onupgradeneeded = () => {
                 // Pokud databáze ještě neexistuje, vytvoří se
-                openRequest.result.createObjectStore('items', { keyPath: 'nazev' });
+                openRequest.result.createObjectStore(this.tableName, { keyPath: 'nazev' });
             };
 
             openRequest.onerror = () => {
@@ -76,8 +72,8 @@ class DatabaseManager {
 
             openRequest.onsuccess = () => {
                 let db = openRequest.result;
-                let transaction = db.transaction('items', 'readonly');
-                let store = transaction.objectStore('items');
+                let transaction = db.transaction(this.tableName, 'readonly');
+                let store = transaction.objectStore(this.tableName);
                 let request = store.getAll();
 
                 request.onerror = () => {
@@ -91,57 +87,54 @@ class DatabaseManager {
         });
     }
 
-    odesliData(data) {
+    async odesliData(data) {
         return new Promise((resolve, reject) => {
             // Ensure the database is initialized
             if (!this.db) {
                 reject('Database not initialized');
                 return;
             }
-    
-            const transaction = this.db.transaction(["items"], "readwrite");
-            const store = transaction.objectStore("items");
-   // store.clear();
+
+            const transaction = this.db.transaction([this.tableName], "readwrite");
+            const store = transaction.objectStore(this.tableName);
+
             // Projdeme všechny položky v poli aktualizace
             for (const item of data) {
                 const request = store.put(item);
-        
+
                 request.onsuccess = () => {
-                  resolve();
+                    resolve();
                 };
-        
+
                 request.onerror = (event) => {
-                  reject(event.target.error);
+                    reject(event.target.error);
                 };
-              }
-    
-            transaction.oncomplete = function() {
+            }
+
+            transaction.oncomplete = function () {
                 console.log("Bodies successfully updated for all items");
                 resolve();
             };
-    
-            transaction.onerror = function(event) {
+
+            transaction.onerror = function (event) {
                 console.error("Error updating bodies for items:", event.target.error);
                 reject(event.target.error);
             };
         });
     }
-    
-    
+    vypisSeznam(pole) {
 
-   vypisSeznam(pole) {
-    
-    let seznam = document.getElementById("seznam");
+        let seznam = document.getElementById("seznam");
         pole.sort((a, b) => b.body - a.body);
         for (let i = 0; i < pole.length; i++) {
             let polozkaSeznamu = document.createElement("li");
-            polozkaSeznamu.className = "list-group-item border-0 round";
+            polozkaSeznamu.className = "list-group-item text-center border-0 round";
             polozkaSeznamu.id = "polozka-" + i;
             polozkaSeznamu.textContent = pole[i].nazev;
             seznam.appendChild(polozkaSeznamu);
         }
     }
-    
+
 }
 
 

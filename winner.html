@@ -8,23 +8,27 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="styly.css">
 </head>
+
 <body>
     <div class="container-sm " id="obal">
-
-        <ul class="list-group d-flex align-items-center" id="seznam"></ul>
+        <div class="container" id="odsazeni">
+            <ul class="list-group" id="seznam"></ul>
+        </div>
     </div>
-    
+
     <script src="addToDB.js"></script>
     <script src="rozdel.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script>
-    const databaze = new DatabaseManager("zebricek", 1);
-    databaze.nactiData().then(policko => {
-        databaze.vypisSeznam(policko);       
+        
+        const databaze = new DatabaseManager("zebricek", "items", 1);
+        databaze.nactiData().then(policko => {
+            databaze.vypisSeznam(policko);
         });
-        </script>
-    
+    </script>
+
 </body>
+
 </html>

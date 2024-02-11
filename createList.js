@@ -13,12 +13,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function addRow() {
         // Vytvoření nového řádku s inputem
         var newRow = document.createElement("div");
-        newRow.className = "form-group col-md-6 mb-3";
+        newRow.className = "form-group";
         newRow.innerHTML = '<div class="d-flex align-items-center"><input type="text" class="form-control" name="item ' + pocet + '" placeholder="Položka ' + pocet + '"></div>';
         pocet++;
         // Přidání nového řádku do formuláře
         document.getElementById("myForm").appendChild(newRow);
         var newInput = newRow.querySelector("input");
         newInput.focus();
+       
     }
 });

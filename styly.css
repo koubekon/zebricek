@@ -1,40 +1,69 @@
+body, html {
+    height: 100%;
+}
+.page-content {
+    flex: 1 0 auto;
+}
+.page-footer {
+    flex-shrink: none;
+}
+/* Sticky footer */
+.container-fluid {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.footer {
+    background-color: #f5f5f5;
+    position: relative;
+    width: 100%;
+    bottom: 0;
+}
+.sidebar {
+    background-color: #f0f0f0;
+    padding: 20px;
+}
+
 #obal {
     position: relative;
     margin: auto;
-    max-width: 576px;
-
 }
+
 
 #odsazeni {
     padding-top: 30%;
 }
 
-#prvni, #druhy {
+#prvni,
+#druhy {
     height: 150px;
-   font-size: xx-large;
-   transition: background 0.2s;
+    font-size: xx-large;
+    transition: background 0.2s;
 }
 
-#prvni:hover, #druhy:hover {
+#prvni:hover,
+#druhy:hover {
     background-color: grey;
     color: white;
     height: 150px;
-   font-size: xx-large;
+    font-size: xx-large;
 }
 
 #polozka-0 {
-font-size: xx-large;
-font-weight: 700;
-background-color: gold;
+    font-size: xx-large;
+    font-weight: 700;
+    background-color: gold;
 }
+
 #polozka-1 {
     font-size: larger;
     font-weight: 600;
     background-color: silver;
-    }
-    #polozka-2 {
-        font-size: large;
-        font-weight: 400;
-        background-color: brown;
-        color: white;
-        }
+}
+
+#polozka-2 {
+    font-size: large;
+    font-weight: 400;
+    background-color: brown;
+    color: white;
+}
