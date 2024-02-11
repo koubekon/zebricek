@@ -31,14 +31,14 @@
         <div class="page-content row flex-grow-1">
             <div class="col-md-9 p-4">
 
-                <form id="nazev">
+                <!-- <form id="nazev">
                     <h3>Název žebříčku</h3>
                     <div class="form-group">
                         <div class="d-flex align-items-center">
                             <input type="text" class="form-control" name="nazev" placeholder="Název žebříčku">
                         </div>
                     </div>
-                </form>
+                </form> -->
                 <form id="myForm">
                     <h3>Položky</h3>
                     <!-- První řádek formuláře s obrázkem -->
@@ -56,7 +56,7 @@
             </div>
             <aside class="col-md-3 sidebar justify-content-end">
                 <h3>Historie</h3>
-                <p>Tady je prostor pro postranní panel.</p>
+               
             </aside>
         </div>
         <footer class="page-footer mt-auto">
@@ -71,21 +71,48 @@
         <script src="createList.js"></script>
         <script src="addToDB.js"></script>
         <script>
-            
-            const databaze = new DatabaseManager("zebricek", "items", 1);
-            document.getElementById("startComparing").addEventListener("click", () => {
+            document.addEventListener('DOMContentLoaded', () => {
+                const databaze = new DatabaseManager("zebricek", "items", 1);
+                databaze.init().then(() => {
+                    databaze.nactiHistorii().then(historie => {
+                            const sidebar = document.querySelector('.sidebar');
 
-                    databaze.init().then(() => {
-                        databaze.pridejPolozky()
-                            .then(() => {
-                                window.location.href = "compare.html";
+                            historie.forEach(h => {
+                                const btn = document.createElement('button');
+                                btn.classList.add('btn', 'btn-info', 'mb-2', 'w-100');
+                                btn.id = h.nazev; // Použití 'nazev' jako id
+                                btn.textContent = h.vlastniNazev; // Zobrazení 'vlastniNazev'
 
-                            })
-                            .catch(error => {
-                                alert(error);
-                           
+                                // Přidání události kliknutí na tlačítko
+                                btn.addEventListener('click', () => {
+                                    window.location.href = "history.html?id=" + h.nazev;
+                                });
+
+                                sidebar.appendChild(btn); // Přidání tlačítka do sidebaru
+                            });
+                        }).catch(error => {
+                            console.error('Chyba při načítání historie:', error);
+                        });
+                    document.getElementById("startComparing").addEventListener("click", () => {
+
+
+                        databaze.clearAll().then(() => {
+
+                            databaze.pridejPolozky()
+                                .then(() => {
+                                    window.location.href = "compare.html";
+
+                                })
+                                .catch(error => {
+                                    alert(error);
+
+                                })
+                        })
+                        
                     })
-                })
+                });
+
+
             });
         </script>
 </body>

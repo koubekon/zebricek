@@ -6,29 +6,56 @@ class DatabaseManager {
         this.tableName = tableName;
         this.tableNum = 1;
     }
-
     async init() {
         return new Promise((resolve, reject) => {
-          const request = indexedDB.open(this.dbName, this.dbVersion);
-    
-          request.onupgradeneeded = event => {
-            const db = event.target.result;
-    if (!db.objectStoreNames.contains('items')) {
+            const request = indexedDB.open(this.dbName, this.dbVersion);
+
+            request.onupgradeneeded = event => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('items')) {
                     db.createObjectStore('items', { keyPath: 'nazev', autoIncrement: false });
-}
-          };
-    
-          request.onsuccess = event => {
-            this.db = event.target.result;
-            resolve();
-          };
-    
-          request.onerror = event => {
-            console.error('Database error:', event.target.errorCode);
-            reject(event.target.errorCode);
-          };
+                }
+                if (!db.objectStoreNames.contains('historie')) {
+                    db.createObjectStore('historie', { keyPath: 'id', autoIncrement: true });
+                }
+                
+            };
+
+            request.onsuccess = event => {
+                this.db = event.target.result;
+                resolve();
+            };
+
+            request.onerror = event => {
+                console.error('Database error:', event.target.errorCode);
+                reject(event.target.errorCode);
+            };
         });
-      }   
+    }
+
+    async clearAll() {
+        return new Promise((resolve, reject) => {
+            // Zkontrolovat, zda je databáze inicializována
+            if (!this.db) {
+                reject('Databáze není inicializována');
+                return;
+            }
+
+            const transaction = this.db.transaction([this.tableName], "readwrite");
+            const store = transaction.objectStore(this.tableName);
+            const request = store.clear(); // Vymazat všechny záznamy v object store
+
+            request.onsuccess = () => {
+                console.log("Všechny položky byly úspěšně vymazány.");
+                resolve();
+            };
+
+            request.onerror = (event) => {
+                console.error("Chyba při mazání položek:", event.target.error);
+                reject(event.target.error);
+            };
+        });
+    }
 
     async pridejPolozky() {
         return new Promise((resolve, reject) => {
@@ -122,6 +149,47 @@ class DatabaseManager {
             };
         });
     }
+
+    async ulozitZebricek(nazevZebricku, nazevZebricky) {
+        if (!this.db) throw new Error('Databáze není inicializována');
+    
+        const transaction = this.db.transaction(['historie', 'items'], 'readwrite');
+        const historieStore = transaction.objectStore('historie');
+        const itemsStore = transaction.objectStore('items');
+    
+        // Získání položek z 'items'
+        const itemsRequest = itemsStore.getAll();
+        await new Promise((resolve, reject) => {
+            itemsRequest.onsuccess = () => resolve();
+            itemsRequest.onerror = () => reject(itemsRequest.error);
+        });
+        const items = itemsRequest.result;
+    
+        // Uložení položek do nového žebříčku (v praxi jako záznam v 'historie')
+        const historieRequest = historieStore.add({ nazev: nazevZebricku, vlastniNazev: nazevZebricky, datum: new Date(), items: items });
+        return new Promise((resolve, reject) => {
+            historieRequest.onsuccess = () => resolve(historieRequest.result);
+            historieRequest.onerror = () => reject(historieRequest.error);
+        });
+    }
+
+    async nactiHistorii() {
+    if (!this.db) throw new Error('Databáze není inicializována');
+
+    return new Promise((resolve, reject) => {
+        const transaction = this.db.transaction(['historie'], 'readonly');
+        const store = transaction.objectStore('historie');
+        const request = store.getAll();
+
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
+
+        request.onerror = (event) => {
+            reject(event.target.error);
+        };
+    });
+}
     vypisSeznam(pole) {
 
         let seznam = document.getElementById("seznam");

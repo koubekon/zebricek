@@ -10,11 +10,53 @@
 </head>
 
 <body>
-    <div class="container-sm " id="obal">
+    <div class="container-fluid d-flex flex-column">
+        <header class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Vytvoř si vlastní žebříček.</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Přepnout navigaci">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="index.html">Domů <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="ulozit" data-toggle="modal" data-target="#ulozitModal">Uložit žebříček</a>
+                    </li>
+                </ul>
+            </div>
+        </header>
+
         <div class="container" id="odsazeni">
             <ul class="list-group" id="seznam"></ul>
         </div>
+<!-- Modal -->
+<div class="modal fade" id="ulozitModal" tabindex="-1" role="dialog" aria-labelledby="ulozitModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="ulozitModalLabel">Přejete si uložit žebříček?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Zavřít">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="nazev-zebricky" class="col-form-label">Název žebříčku:</label>
+              <input type="text" class="form-control" id="nazev-zebricky">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Zpět</button>
+          <button type="button" class="btn btn-primary" id="ulozit-zebricek">Uložit</button>
+        </div>
+      </div>
     </div>
+  </div>
 
     <script src="addToDB.js"></script>
     <script src="rozdel.js"></script>
@@ -22,11 +64,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script>
-        
+
         const databaze = new DatabaseManager("zebricek", "items", 1);
+        databaze.init();
         databaze.nactiData().then(policko => {
             databaze.vypisSeznam(policko);
+
+
         });
+        document.getElementById('ulozit-zebricek').addEventListener('click', function() {
+            var nazevZebricky = document.getElementById('nazev-zebricky').value;
+    const nazevZebricku = 'Zebricek_' + new Date().toISOString(); // Generování jedinečného názvu
+    databaze.ulozitZebricek(nazevZebricku, nazevZebricky).then(() => {
+        console.log('Žebříček byl uložen.');
+        window.location.href = "index.html";
+        // Zde můžete přidat další logiku, např. aktualizaci uživatelského rozhraní
+    }).catch(console.error);
+});
     </script>
 
 </body>
