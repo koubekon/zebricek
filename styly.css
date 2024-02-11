@@ -5,6 +5,7 @@ body, html {
     flex: 1 0 auto;
 }
 .page-footer {
+    
     flex-shrink: none;
 }
 /* Sticky footer */
@@ -31,7 +32,8 @@ body, html {
 
 
 #odsazeni {
-    padding-top: 30%;
+    position: relative;
+    padding-top: 20px;
 }
 
 #prvni,
